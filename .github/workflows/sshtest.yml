@@ -1,0 +1,27 @@
+name: Run SSH Commands
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - sshdata/**
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install tailscale
+        run: |
+          curl -fsSL https://tailscale.com/install.sh | sh
+          sudo tailscale up --accept-routes --authkey ${{ secrets.TAILSCALE_KEY }}
+
+      - name: Setup SSH
+        run: |
+          mkdir .ssh && echo ${{ secrets.SSH_PRIVKEY }} > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa && chmod 700 ~/.ssh
+
+      - name: Run SSH commands
+        run: |
+          cat /github/workspace/sshdata/test.sh | ssh vcokltfre@10.1.1.132 -i ~/.ssh/id_rsa
