@@ -22,9 +22,12 @@ jobs:
 
       - name: Setup SSH
         run: |
-          mkdir .ssh && echo EOF
-            {{ secrets.SSH_PRIVKEY }}"
-          EOF > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa && chmod 700 ~/.ssh
+          mkdir .ssh && touch ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa && chmod 700 ~/.ssh
+
+      - name: Set SSH Key
+        run: 'echo "$SSH_KEY" > ~/.ssh/id_rsa'
+        env:
+          SSH_KEY: ${{ secrets.SSH_PRIVKEY }}
 
       - name: Run SSH commands
         run: |
